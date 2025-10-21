@@ -1,4 +1,5 @@
 import { Plus, Server, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +44,8 @@ const environments = [
 ];
 
 export default function Environments() {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -52,7 +55,7 @@ export default function Environments() {
             Manage deployment environments and AWS configurations
           </p>
         </div>
-        <Button>
+        <Button onClick={() => navigate("/environments/create")}>
           <Plus className="h-4 w-4 mr-2" />
           Add Environment
         </Button>

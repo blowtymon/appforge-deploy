@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Gitgraph, Mode, TemplateName } from "@gitgraph/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { GitBranch, GitCommit, FileCode, User, Calendar, Search, Filter } from "lucide-react";
+import { GitBranch, GitCommit, FileCode, User, Calendar, Search, Plus, ExternalLink } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Commit {
@@ -21,7 +22,55 @@ interface Commit {
   files: string[];
 }
 
+interface Repository {
+  id: string;
+  name: string;
+  url: string;
+  visibility: "public" | "private";
+  createdAt: string;
+  lastCommit: string;
+  apps: string[];
+  branches: number;
+  commits: number;
+}
+
 // Mock data
+const mockRepos: Repository[] = [
+  {
+    id: "1",
+    name: "my-first-repo",
+    url: "github.com/user/my-first-repo",
+    visibility: "private",
+    createdAt: "2025-01-10",
+    lastCommit: "2025-01-15",
+    apps: ["Dashboard App", "Admin Portal"],
+    branches: 3,
+    commits: 45,
+  },
+  {
+    id: "2",
+    name: "dashboard-app",
+    url: "github.com/user/dashboard-app",
+    visibility: "public",
+    createdAt: "2025-01-05",
+    lastCommit: "2025-01-14",
+    apps: ["Analytics Dashboard"],
+    branches: 5,
+    commits: 67,
+  },
+  {
+    id: "3",
+    name: "ecommerce-site",
+    url: "github.com/user/ecommerce-site",
+    visibility: "private",
+    createdAt: "2024-12-20",
+    lastCommit: "2025-01-13",
+    apps: ["Store Frontend", "Store Admin"],
+    branches: 4,
+    commits: 89,
+  },
+];
+
 const mockCommits: Commit[] = [
   {
     id: "1",
@@ -73,11 +122,13 @@ const mockCommits: Commit[] = [
 ];
 
 export default function RepoDashboard() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedAuthor, setSelectedAuthor] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
+  const [repoSearchQuery, setRepoSearchQuery] = useState("");
 
   const branches = ["all", ...Array.from(new Set(mockCommits.map(c => c.branch)))];
   const authors = ["all", ...Array.from(new Set(mockCommits.map(c => c.author)))];
@@ -100,6 +151,11 @@ export default function RepoDashboard() {
   const totalCommits = mockCommits.length;
   const totalDeployments = mockCommits.reduce((acc, c) => acc + c.deployments.length, 0);
   const activeBranches = branches.length - 1;
+
+  const filteredRepos = mockRepos.filter((repo) =>
+    repo.name.toLowerCase().includes(repoSearchQuery.toLowerCase()) ||
+    repo.apps.some((app) => app.toLowerCase().includes(repoSearchQuery.toLowerCase()))
+  );
 
   return (
     <div className="space-y-6">
@@ -146,12 +202,97 @@ export default function RepoDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="commits" className="space-y-4">
+      <Tabs defaultValue="repos" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="repos">Repositories</TabsTrigger>
           <TabsTrigger value="commits">Commits</TabsTrigger>
           <TabsTrigger value="graph">Git Graph</TabsTrigger>
           <TabsTrigger value="visualization">Repo Visualization</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="repos" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search repositories or apps..."
+                value={repoSearchQuery}
+                onChange={(e) => setRepoSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Button onClick={() => navigate("/repository/create")}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Repository
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>All Repositories</CardTitle>
+              <CardDescription>
+                {filteredRepos.length} repositories found
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Repository</TableHead>
+                    <TableHead>Visibility</TableHead>
+                    <TableHead>Associated Apps</TableHead>
+                    <TableHead>Branches</TableHead>
+                    <TableHead>Commits</TableHead>
+                    <TableHead>Last Commit</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRepos.map((repo) => (
+                    <TableRow key={repo.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium flex items-center gap-2">
+                            <GitBranch className="h-4 w-4" />
+                            {repo.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{repo.url}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={repo.visibility === "public" ? "default" : "secondary"}>
+                          {repo.visibility}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {repo.apps.map((app, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {app}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>{repo.branches}</TableCell>
+                      <TableCell>{repo.commits}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span className="text-sm">{repo.lastCommit}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm">
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="commits" className="space-y-4">
           {/* Filters */}

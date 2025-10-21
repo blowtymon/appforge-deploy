@@ -7,13 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowLeft, ArrowRight, Check, GitBranch, Plus } from "lucide-react";
 
 const steps = [
   { id: 1, title: "Basic Info", description: "App name and description" },
-  { id: 2, title: "Features", description: "Select app features" },
-  { id: 3, title: "Environment", description: "Choose environment" },
-  { id: 4, title: "Review", description: "Confirm and create" },
+  { id: 2, title: "Repository", description: "Select or create repository" },
+  { id: 3, title: "Features", description: "Select app features" },
+  { id: 4, title: "Environment", description: "Choose environment" },
+  { id: 5, title: "Review", description: "Confirm and create" },
 ];
 
 const features = [
@@ -31,10 +33,20 @@ export default function CreateApp() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    repoOption: "new" as "new" | "existing",
+    existingRepo: "",
+    newRepoName: "",
     features: [] as string[],
     environment: "",
     domain: "",
   });
+
+  // Mock existing repos
+  const existingRepos = [
+    { id: "1", name: "my-first-repo", url: "github.com/user/my-first-repo" },
+    { id: "2", name: "dashboard-app", url: "github.com/user/dashboard-app" },
+    { id: "3", name: "ecommerce-site", url: "github.com/user/ecommerce-site" },
+  ];
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -127,6 +139,82 @@ export default function CreateApp() {
           )}
 
           {currentStep === 2 && (
+            <div className="space-y-6">
+              <RadioGroup
+                value={formData.repoOption}
+                onValueChange={(value: "new" | "existing") =>
+                  setFormData({ ...formData, repoOption: value })
+                }
+              >
+                <div className="flex items-start space-x-3 p-4 border rounded-lg">
+                  <RadioGroupItem value="new" id="new" />
+                  <div className="flex-1">
+                    <Label htmlFor="new" className="font-semibold cursor-pointer flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Create New Repository
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Generate a new GitHub repository with boilerplate code
+                    </p>
+                    {formData.repoOption === "new" && (
+                      <div className="mt-4">
+                        <Label htmlFor="newRepoName">Repository Name</Label>
+                        <Input
+                          id="newRepoName"
+                          placeholder="my-awesome-app"
+                          value={formData.newRepoName}
+                          onChange={(e) =>
+                            setFormData({ ...formData, newRepoName: e.target.value })
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3 p-4 border rounded-lg">
+                  <RadioGroupItem value="existing" id="existing" />
+                  <div className="flex-1">
+                    <Label htmlFor="existing" className="font-semibold cursor-pointer flex items-center gap-2">
+                      <GitBranch className="h-4 w-4" />
+                      Use Existing Repository
+                    </Label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Connect to an existing GitHub repository
+                    </p>
+                    {formData.repoOption === "existing" && (
+                      <div className="mt-4">
+                        <Label htmlFor="existingRepo">Select Repository</Label>
+                        <Select
+                          value={formData.existingRepo}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, existingRepo: value })
+                          }
+                        >
+                          <SelectTrigger className="mt-2">
+                            <SelectValue placeholder="Select a repository" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {existingRepos.map((repo) => (
+                              <SelectItem key={repo.id} value={repo.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{repo.name}</span>
+                                  <span className="text-xs text-muted-foreground">{repo.url}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
+          {currentStep === 3 && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Select the features you want to include in your app
@@ -158,7 +246,7 @@ export default function CreateApp() {
             </div>
           )}
 
-          {currentStep === 3 && (
+          {currentStep === 4 && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="environment">Environment</Label>
@@ -189,7 +277,7 @@ export default function CreateApp() {
             </>
           )}
 
-          {currentStep === 4 && (
+          {currentStep === 5 && (
             <div className="space-y-4">
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <h4 className="font-semibold">App Name</h4>
@@ -198,6 +286,17 @@ export default function CreateApp() {
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <h4 className="font-semibold">Description</h4>
                 <p className="text-sm text-muted-foreground">{formData.description}</p>
+              </div>
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <h4 className="font-semibold">Repository</h4>
+                <p className="text-sm text-muted-foreground">
+                  {formData.repoOption === "new"
+                    ? `New Repository: ${formData.newRepoName}`
+                    : `Existing Repository: ${
+                        existingRepos.find((r) => r.id === formData.existingRepo)?.name ||
+                        "Not selected"
+                      }`}
+                </p>
               </div>
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <h4 className="font-semibold">Features</h4>

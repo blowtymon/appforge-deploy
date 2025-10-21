@@ -13,6 +13,8 @@ import Environments from "./pages/Environments";
 import Domains from "./pages/Domains";
 import Settings from "./pages/Settings";
 import RepoDashboard from "./pages/RepoDashboard";
+import CreateRepo from "./pages/CreateRepo";
+import CreateEnvironment from "./pages/CreateEnvironment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/environments" element={<AppLayout><Environments /></AppLayout>} />
           <Route path="/domains" element={<AppLayout><Domains /></AppLayout>} />
           <Route path="/repository" element={<AppLayout><RepoDashboard /></AppLayout>} />
+          <Route path="/repository/create" element={<AppLayout><CreateRepo /></AppLayout>} />
+          <Route path="/environments/create" element={<AppLayout><CreateEnvironment /></AppLayout>} />
           <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
