@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import Environments from "./pages/Environments";
 import Domains from "./pages/Domains";
 import Settings from "./pages/Settings";
+import RepoDashboard from "./pages/RepoDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/users" element={<AppLayout><Users /></AppLayout>} />
           <Route path="/environments" element={<AppLayout><Environments /></AppLayout>} />
           <Route path="/domains" element={<AppLayout><Domains /></AppLayout>} />
+          <Route path="/repository" element={<AppLayout><RepoDashboard /></AppLayout>} />
           <Route path="/settings" element={<AppLayout><Settings /></AppLayout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

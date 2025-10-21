@@ -7,6 +7,7 @@ import {
   Globe,
   Settings,
   Plus,
+  GitBranch,
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,7 @@ const navItems = [
   { title: "Users", url: "/users", icon: Users },
   { title: "Environments", url: "/environments", icon: Server },
   { title: "Domains", url: "/domains", icon: Globe },
+  { title: "Repository", url: "/repository", icon: GitBranch },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
