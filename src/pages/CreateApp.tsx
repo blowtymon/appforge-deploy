@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, ArrowRight, Check, GitBranch, Plus } from "lucide-react";
+import { PageBuilder } from "@/components/pagebuilder/PageBuilder";
 
 const steps = [
   { id: 1, title: "Basic Info", description: "App name and description" },
@@ -216,33 +217,39 @@ export default function CreateApp() {
 
           {currentStep === 3 && (
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Select the features you want to include in your app
-              </p>
-              {features.map((feature) => (
-                <div key={feature.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={feature.id}
-                    checked={formData.features.includes(feature.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFormData({
-                          ...formData,
-                          features: [...formData.features, feature.id],
-                        });
-                      } else {
-                        setFormData({
-                          ...formData,
-                          features: formData.features.filter((f) => f !== feature.id),
-                        });
-                      }
-                    }}
-                  />
-                  <Label htmlFor={feature.id} className="font-normal cursor-pointer">
-                    {feature.label}
-                  </Label>
-                </div>
-              ))}
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Build your app pages using AI-powered chat interface
+                </p>
+                <PageBuilder />
+              </div>
+              <div className="mt-6 space-y-4">
+                <p className="text-sm font-medium">Or select pre-built features:</p>
+                {features.map((feature) => (
+                  <div key={feature.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={feature.id}
+                      checked={formData.features.includes(feature.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData({
+                            ...formData,
+                            features: [...formData.features, feature.id],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            features: formData.features.filter((f) => f !== feature.id),
+                          });
+                        }
+                      }}
+                    />
+                    <Label htmlFor={feature.id} className="font-normal cursor-pointer">
+                      {feature.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
