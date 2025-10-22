@@ -51,6 +51,18 @@ const channelOptions = [
 ];
 
 export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps) {
+  const steps = [
+    { id: 10, title: "Market Research", icon: "📊" },
+    { id: 11, title: "Competitors", icon: "🎯" },
+    { id: 12, title: "SWOT", icon: "📈" },
+    { id: 13, title: "Pricing Model", icon: "💰" },
+    { id: 14, title: "Platforms", icon: "📱" },
+    { id: 15, title: "Channels", icon: "🏪" },
+    { id: 16, title: "Business Plan", icon: "📋" },
+    { id: 17, title: "Marketing Plan", icon: "📣" },
+    { id: 18, title: "Advertising Plan", icon: "📢" },
+  ];
+
   const addCompetitor = () => {
     onDataChange({
       competitors: [
@@ -70,7 +82,27 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
   };
 
   return (
-    <>
+    <div className="space-y-6">
+      {/* Step Navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {steps.map((s) => (
+          <div
+            key={s.id}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border whitespace-nowrap ${
+              step === s.id
+                ? "border-green-500 bg-green-500/10 text-green-600"
+                : step > s.id
+                ? "border-primary bg-primary/10"
+                : "border-border bg-muted"
+            }`}
+          >
+            <span className="text-lg">{s.icon}</span>
+            <span className="text-sm font-medium">{s.title}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Step Content */}
       {step === 10 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
@@ -437,6 +469,6 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

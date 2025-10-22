@@ -1,53 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { BrainstormingPhase } from "@/components/appwizard/BrainstormingPhase";
 import { MarketingPhase } from "@/components/appwizard/MarketingPhase";
 import { InceptionPhase } from "@/components/appwizard/InceptionPhase";
-
-// Define all steps across three phases
-const allSteps = [
-  // Phase 1: Brainstorming (1-9)
-  { id: 1, phase: "Brainstorming", title: "Description", description: "Project overview" },
-  { id: 2, phase: "Brainstorming", title: "Keywords/Tags", description: "Categorize your app" },
-  { id: 3, phase: "Brainstorming", title: "Intersections", description: "Technology connections" },
-  { id: 4, phase: "Brainstorming", title: "Use Cases", description: "Define scenarios" },
-  { id: 5, phase: "Brainstorming", title: "Brain Map", description: "Visualize concepts" },
-  { id: 6, phase: "Brainstorming", title: "User Stories", description: "User requirements" },
-  { id: 7, phase: "Brainstorming", title: "Feature List", description: "Core features" },
-  { id: 8, phase: "Brainstorming", title: "Requirements", description: "Technical specs" },
-  { id: 9, phase: "Brainstorming", title: "Kanban", description: "Task organization" },
-  
-  // Phase 2: Marketing (10-18)
-  { id: 10, phase: "Marketing", title: "Market Research", description: "Analyze market" },
-  { id: 11, phase: "Marketing", title: "Competitors", description: "Competition analysis" },
-  { id: 12, phase: "Marketing", title: "SWOT", description: "Strategic analysis" },
-  { id: 13, phase: "Marketing", title: "Pricing Model", description: "Revenue strategy" },
-  { id: 14, phase: "Marketing", title: "Platforms", description: "Target platforms" },
-  { id: 15, phase: "Marketing", title: "Channels", description: "Distribution" },
-  { id: 16, phase: "Marketing", title: "Business Plan", description: "Business strategy" },
-  { id: 17, phase: "Marketing", title: "Marketing Plan", description: "Marketing strategy" },
-  { id: 18, phase: "Marketing", title: "Advertising Plan", description: "Ad strategy" },
-  
-  // Phase 3: Inception (19-29)
-  { id: 19, phase: "Inception", title: "App Creation", description: "Basic setup" },
-  { id: 20, phase: "Inception", title: "Domain Name", description: "Secure domain" },
-  { id: 21, phase: "Inception", title: "Features", description: "Select features" },
-  { id: 22, phase: "Inception", title: "Page Generation", description: "Generate pages" },
-  { id: 23, phase: "Inception", title: "Content Mgmt", description: "CMS setup" },
-  { id: 24, phase: "Inception", title: "Cloud Infra", description: "AWS accounts" },
-  { id: 25, phase: "Inception", title: "Environments", description: "Dev/QA/Prod" },
-  { id: 26, phase: "Inception", title: "Repo/Branches", description: "GitHub setup" },
-  { id: 27, phase: "Inception", title: "Versions", description: "Version control" },
-  { id: 28, phase: "Inception", title: "Release", description: "Release notes" },
-  { id: 29, phase: "Inception", title: "Deployments", description: "Deploy config" },
-];
+import { PhaseNavigation } from "@/components/appwizard/PhaseNavigation";
 
 export default function CreateApp() {
   const navigate = useNavigate();
+  const [currentPhase, setCurrentPhase] = useState<"brainstorming" | "marketing" | "inception">("brainstorming");
   const [currentStep, setCurrentStep] = useState(1);
+  
+  // Phase completion tracking
+  const [phaseCompletion, setPhaseCompletion] = useState({
+    brainstorming: false,
+    marketing: false,
+    inception: false,
+  });
   
   // Brainstorming data
   const [brainstormingData, setBrainstormingData] = useState({
@@ -95,143 +66,138 @@ export default function CreateApp() {
     deploymentTarget: "",
   });
 
-  const currentPhase = allSteps[currentStep - 1]?.phase || "";
+  // Phase definitions
+  const phases = [
+    {
+      id: "brainstorming",
+      title: "🧠 Brainstorming",
+      description: "Idea incubation and planning. Define your concept, features, and requirements.",
+      icon: "🧠",
+      color: "bg-blue-500",
+      status: phaseCompletion.brainstorming ? "completed" : currentPhase === "brainstorming" ? "active" : "locked",
+      stepRange: [1, 9],
+    },
+    {
+      id: "marketing",
+      title: "📈 Marketing",
+      description: "Market validation and positioning. Research competitors and define your strategy.",
+      icon: "📈",
+      color: "bg-green-500",
+      status: !phaseCompletion.brainstorming 
+        ? "locked" 
+        : phaseCompletion.marketing 
+        ? "completed" 
+        : currentPhase === "marketing" 
+        ? "active" 
+        : "locked",
+      stepRange: [10, 18],
+    },
+    {
+      id: "inception",
+      title: "⚙️ Inception",
+      description: "Build and deploy your app. Create infrastructure, configure environments, and launch.",
+      icon: "⚙️",
+      color: "bg-purple-500",
+      status: !phaseCompletion.marketing 
+        ? "locked" 
+        : phaseCompletion.inception 
+        ? "completed" 
+        : currentPhase === "inception" 
+        ? "active" 
+        : "locked",
+      stepRange: [19, 29],
+    },
+  ];
+
+  const currentPhaseData = phases.find((p) => p.id === currentPhase);
+  const minStep = currentPhaseData?.stepRange[0] || 1;
+  const maxStep = currentPhaseData?.stepRange[1] || 9;
 
   const handleNext = () => {
-    if (currentStep < allSteps.length) {
+    if (currentStep < maxStep) {
       setCurrentStep(currentStep + 1);
+    } else if (currentStep === maxStep) {
+      // Complete current phase and move to next
+      if (currentPhase === "brainstorming") {
+        setPhaseCompletion({ ...phaseCompletion, brainstorming: true });
+        setCurrentPhase("marketing");
+        setCurrentStep(10);
+      } else if (currentPhase === "marketing") {
+        setPhaseCompletion({ ...phaseCompletion, marketing: true });
+        setCurrentPhase("inception");
+        setCurrentStep(19);
+      }
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
+    if (currentStep > minStep) {
       setCurrentStep(currentStep - 1);
+    } else if (currentStep === minStep && currentPhase !== "brainstorming") {
+      // Go back to previous phase
+      if (currentPhase === "marketing") {
+        setCurrentPhase("brainstorming");
+        setCurrentStep(9);
+      } else if (currentPhase === "inception") {
+        setCurrentPhase("marketing");
+        setCurrentStep(18);
+      }
     }
   };
 
-  const handleCreate = () => {
-    // Here would be the API call to create the app with all collected data
-    console.log("Brainstorming:", brainstormingData);
-    console.log("Marketing:", marketingData);
-    console.log("Inception:", inceptionData);
+  const handlePhaseChange = (phaseId: string) => {
+    const phase = phases.find((p) => p.id === phaseId);
+    if (phase && phase.status !== "locked") {
+      setCurrentPhase(phaseId as "brainstorming" | "marketing" | "inception");
+      setCurrentStep(phase.stepRange[0]);
+    }
+  };
+
+  const handleComplete = () => {
+    setPhaseCompletion({ ...phaseCompletion, inception: true });
+    console.log("All data:", { brainstormingData, marketingData, inceptionData });
     navigate("/apps");
   };
 
-  const getPhaseColor = (phase: string) => {
-    switch (phase) {
-      case "Brainstorming":
-        return "text-blue-500 border-blue-500 bg-blue-500";
-      case "Marketing":
-        return "text-green-500 border-green-500 bg-green-500";
-      case "Inception":
-        return "text-purple-500 border-purple-500 bg-purple-500";
-      default:
-        return "text-muted-foreground border-border bg-muted";
-    }
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/apps")}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Create New App</h1>
-          <p className="text-muted-foreground">Set up your application in a few simple steps</p>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          {["Brainstorming", "Marketing", "Inception"].map((phase, phaseIndex) => {
-            const phaseSteps = allSteps.filter((s) => s.phase === phase);
-            const firstStepId = phaseSteps[0]?.id || 0;
-            const lastStepId = phaseSteps[phaseSteps.length - 1]?.id || 0;
-            const isActive = currentStep >= firstStepId && currentStep <= lastStepId;
-            const isCompleted = currentStep > lastStepId;
-
-            return (
-              <div
-                key={phase}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
-                  isActive
-                    ? getPhaseColor(phase).replace("bg-", "bg-opacity-10 ")
-                    : isCompleted
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-muted/30"
-                }`}
-              >
-                <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    isCompleted
-                      ? "bg-primary text-primary-foreground"
-                      : isActive
-                      ? getPhaseColor(phase).split(" ")[2]
-                      : "bg-muted"
-                  }`}
-                >
-                  {isCompleted ? <Check className="h-4 w-4" /> : phaseIndex + 1}
-                </div>
-                <span
-                  className={`text-sm font-semibold ${
-                    isActive || isCompleted ? "" : "text-muted-foreground"
-                  }`}
-                >
-                  {phase}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="overflow-x-auto">
-          <div className="flex gap-2 pb-2 min-w-max">
-            {allSteps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors text-xs ${
-                      currentStep > step.id
-                        ? "bg-primary border-primary text-primary-foreground"
-                        : currentStep === step.id
-                        ? getPhaseColor(step.phase).replace("bg-", "border-")
-                        : "border-border text-muted-foreground"
-                    }`}
-                  >
-                    {currentStep > step.id ? <Check className="h-3 w-3" /> : step.id}
-                  </div>
-                  <div className="text-center mt-1 w-20">
-                    <p className="text-xs font-medium truncate">{step.title}</p>
-                  </div>
-                </div>
-                {index < allSteps.length - 1 && (
-                  <div
-                    className={`h-0.5 w-4 mx-1 transition-colors ${
-                      currentStep > step.id ? "bg-primary" : "bg-border"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+    <div className="max-w-7xl mx-auto space-y-6 px-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/apps")}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Create New App</h1>
+            <p className="text-muted-foreground">
+              Progressive workflow: Brainstorm → Validate → Build → Deploy
+            </p>
           </div>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className={`px-2 py-1 rounded text-xs font-semibold ${getPhaseColor(currentPhase)}`}>
-              {currentPhase}
-            </div>
-            <div>
-              <CardTitle>{allSteps[currentStep - 1].title}</CardTitle>
-              <CardDescription>{allSteps[currentStep - 1].description}</CardDescription>
+      {/* Phase Navigation Cards */}
+      <PhaseNavigation 
+        phases={phases as any}
+        currentPhase={currentPhase}
+        onPhaseChange={handlePhaseChange}
+      />
+
+      {/* Workspace Area */}
+
+      <Card className="border-2">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl flex items-center gap-3">
+              <span className="text-3xl">{currentPhaseData?.icon}</span>
+              {currentPhaseData?.title}
+            </CardTitle>
+            <div className="text-sm text-muted-foreground">
+              Step {currentStep - minStep + 1} of {maxStep - minStep + 1}
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {currentStep >= 1 && currentStep <= 9 && (
+        <CardContent>
+          {currentPhase === "brainstorming" && (
             <BrainstormingPhase
               step={currentStep}
               data={brainstormingData}
@@ -241,7 +207,7 @@ export default function CreateApp() {
             />
           )}
 
-          {currentStep >= 10 && currentStep <= 18 && (
+          {currentPhase === "marketing" && (
             <MarketingPhase
               step={currentStep}
               data={marketingData}
@@ -251,7 +217,7 @@ export default function CreateApp() {
             />
           )}
 
-          {currentStep >= 19 && currentStep <= 29 && (
+          {currentPhase === "inception" && (
             <InceptionPhase
               step={currentStep}
               data={inceptionData}
@@ -263,23 +229,40 @@ export default function CreateApp() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-between items-center">
-        <Button variant="outline" onClick={handleBack} disabled={currentStep === 1}>
+      {/* Navigation Controls */}
+      <div className="flex justify-between items-center py-4 border-t">
+        <Button 
+          variant="outline" 
+          onClick={handleBack} 
+          disabled={currentStep === 1 && currentPhase === "brainstorming"}
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <div className="text-sm text-muted-foreground">
-          Step {currentStep} of {allSteps.length}
+        
+        <div className="flex items-center gap-2">
+          <div className="text-sm text-muted-foreground">
+            {currentPhaseData?.title}
+          </div>
+          <div className="text-sm font-medium">
+            {currentStep - minStep + 1} / {maxStep - minStep + 1}
+          </div>
         </div>
-        {currentStep < allSteps.length ? (
+
+        {currentStep < maxStep ? (
           <Button onClick={handleNext}>
             Next
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
+        ) : currentStep === maxStep && currentPhase !== "inception" ? (
+          <Button onClick={handleNext}>
+            Complete Phase & Continue
+            <Check className="h-4 w-4 ml-2" />
+          </Button>
         ) : (
-          <Button onClick={handleCreate}>
+          <Button onClick={handleComplete} className="bg-gradient-to-r from-purple-500 to-blue-500">
             <Check className="h-4 w-4 mr-2" />
-            Create App
+            Complete & Create App
           </Button>
         )}
       </div>

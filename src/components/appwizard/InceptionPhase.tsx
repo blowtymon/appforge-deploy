@@ -60,8 +60,42 @@ const existingRepos = [
 ];
 
 export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps) {
+  const steps = [
+    { id: 19, title: "App Creation", icon: "🚀" },
+    { id: 20, title: "Domain Name", icon: "🌐" },
+    { id: 21, title: "Features", icon: "⚡" },
+    { id: 22, title: "Page Generation", icon: "📄" },
+    { id: 23, title: "Content Mgmt", icon: "📝" },
+    { id: 24, title: "Cloud Infra", icon: "☁️" },
+    { id: 25, title: "Environments", icon: "🔧" },
+    { id: 26, title: "Repo/Branches", icon: "🌿" },
+    { id: 27, title: "Versions", icon: "🏷️" },
+    { id: 28, title: "Release", icon: "📦" },
+    { id: 29, title: "Deployments", icon: "⚡" },
+  ];
+
   return (
-    <>
+    <div className="space-y-6">
+      {/* Step Navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {steps.map((s) => (
+          <div
+            key={s.id}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border whitespace-nowrap ${
+              step === s.id
+                ? "border-purple-500 bg-purple-500/10 text-purple-600"
+                : step > s.id
+                ? "border-primary bg-primary/10"
+                : "border-border bg-muted"
+            }`}
+          >
+            <span className="text-lg">{s.icon}</span>
+            <span className="text-sm font-medium">{s.title}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Step Content */}
       {step === 19 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
@@ -412,6 +446,6 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

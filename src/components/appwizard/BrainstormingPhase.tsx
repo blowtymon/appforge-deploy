@@ -30,6 +30,18 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
   const [newUseCase, setNewUseCase] = useState("");
   const [newFeature, setNewFeature] = useState("");
 
+  const steps = [
+    { id: 1, title: "Description", icon: "📝" },
+    { id: 2, title: "Keywords/Tags", icon: "🏷️" },
+    { id: 3, title: "Intersections", icon: "🔗" },
+    { id: 4, title: "Use Cases", icon: "💡" },
+    { id: 5, title: "Brain Map", icon: "🗺️" },
+    { id: 6, title: "User Stories", icon: "👥" },
+    { id: 7, title: "Feature List", icon: "📋" },
+    { id: 8, title: "Requirements", icon: "📄" },
+    { id: 9, title: "Kanban", icon: "📊" },
+  ];
+
   const addKeyword = () => {
     if (newKeyword.trim()) {
       onDataChange({ keywords: [...data.keywords, newKeyword.trim()] });
@@ -71,7 +83,27 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
   };
 
   return (
-    <>
+    <div className="space-y-6">
+      {/* Step Navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {steps.map((s) => (
+          <div
+            key={s.id}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border whitespace-nowrap ${
+              step === s.id
+                ? "border-blue-500 bg-blue-500/10 text-blue-600"
+                : step > s.id
+                ? "border-primary bg-primary/10"
+                : "border-border bg-muted"
+            }`}
+          >
+            <span className="text-lg">{s.icon}</span>
+            <span className="text-sm font-medium">{s.title}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Step Content */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
@@ -397,6 +429,6 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
