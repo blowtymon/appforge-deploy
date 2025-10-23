@@ -127,6 +127,7 @@ export default function RepoDashboard() {
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedAuthor, setSelectedAuthor] = useState("all");
   const [sortBy, setSortBy] = useState("date");
+  const [groupBy, setGroupBy] = useState("none");
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
   const [repoSearchQuery, setRepoSearchQuery] = useState("");
 
@@ -152,6 +153,27 @@ export default function RepoDashboard() {
   const totalDeployments = mockCommits.reduce((acc, c) => acc + c.deployments.length, 0);
   const activeBranches = branches.length - 1;
 
+  // Calculate deployments per environment
+  const deploymentsByEnv = mockCommits.reduce((acc, commit) => {
+    commit.deployments.forEach(dep => {
+      if (!acc[dep.env]) acc[dep.env] = 0;
+      acc[dep.env]++;
+    });
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Group commits based on selection
+  const groupedCommits = groupBy === "none" 
+    ? { "All Commits": filteredCommits }
+    : filteredCommits.reduce((acc, commit) => {
+        const key = groupBy === "branch" ? commit.branch 
+                  : groupBy === "author" ? commit.author 
+                  : commit.date;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(commit);
+        return acc;
+      }, {} as Record<string, Commit[]>);
+
   const filteredRepos = mockRepos.filter((repo) =>
     repo.name.toLowerCase().includes(repoSearchQuery.toLowerCase()) ||
     repo.apps.some((app) => app.toLowerCase().includes(repoSearchQuery.toLowerCase()))
@@ -167,7 +189,7 @@ export default function RepoDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Commits</CardTitle>
@@ -175,7 +197,7 @@ export default function RepoDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalCommits}</div>
-            <p className="text-xs text-muted-foreground">Last 30 days</p>
+            <p className="text-xs text-muted-foreground">Auto-incremented</p>
           </CardContent>
         </Card>
 
@@ -197,7 +219,24 @@ export default function RepoDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalDeployments}</div>
-            <p className="text-xs text-muted-foreground">Across all environments</p>
+            <p className="text-xs text-muted-foreground">All environments</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">By Environment</CardTitle>
+            <FileCode className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              {Object.entries(deploymentsByEnv).map(([env, count]) => (
+                <div key={env} className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{env}:</span>
+                  <span className="font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -349,104 +388,152 @@ export default function RepoDashboard() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="pt-2">
+                <label className="text-sm font-medium mb-2 block">Group By</label>
+                <Select value={groupBy} onValueChange={setGroupBy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Group by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Grouping</SelectItem>
+                    <SelectItem value="branch">Branch</SelectItem>
+                    <SelectItem value="author">Author</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
 
           {/* Commits Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Commit History</CardTitle>
-              <CardDescription>
-                {filteredCommits.length} commits found
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Hash</TableHead>
-                    <TableHead>Message</TableHead>
-                    <TableHead>Author</TableHead>
-                    <TableHead>Branch</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Files</TableHead>
-                    <TableHead>Deployments</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCommits.map((commit) => (
-                    <>
-                      <TableRow key={commit.id}>
-                        <TableCell className="font-mono text-xs">{commit.hash}</TableCell>
-                        <TableCell className="font-medium">{commit.message}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            <span className="text-sm">{commit.author}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{commit.branch}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            <span className="text-sm">{commit.date}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{commit.filesChanged} files</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {commit.deployments.map((dep, idx) => (
-                              <Badge key={idx} variant="default" className="text-xs">
-                                {dep.env}: {dep.version}
-                              </Badge>
-                            ))}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setExpandedCommit(expandedCommit === commit.id ? null : commit.id)}
-                          >
-                            {expandedCommit === commit.id ? "Hide" : "Files"}
-                          </Button>
-                        </TableCell>
+          <div className="space-y-4">
+            {Object.entries(groupedCommits).map(([groupName, commits]) => (
+              <Card key={groupName}>
+                <CardHeader>
+                  <CardTitle>
+                    {groupBy === "none" ? "Commit History" : `${groupName}`}
+                  </CardTitle>
+                  <CardDescription>
+                    {commits.length} commit{commits.length !== 1 ? 's' : ''} 
+                    {groupBy !== "none" && ` in this ${groupBy}`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Hash</TableHead>
+                        <TableHead>Message</TableHead>
+                        <TableHead>Author</TableHead>
+                        <TableHead>Branch</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Files</TableHead>
+                        <TableHead>Deployments</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
-                      {expandedCommit === commit.id && (
-                        <TableRow>
-                          <TableCell colSpan={8} className="bg-muted/50">
-                            <div className="py-4">
-                              <h4 className="font-semibold mb-2">Files Changed:</h4>
-                              <ul className="space-y-1">
-                                {commit.files.map((file, idx) => (
-                                  <li key={idx} className="text-sm flex items-center gap-2">
-                                    <FileCode className="h-4 w-4 text-muted-foreground" />
-                                    <code className="text-xs">{file}</code>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {commits.map((commit) => (
+                        <>
+                          <TableRow key={commit.id}>
+                            <TableCell className="font-mono text-xs">{commit.hash}</TableCell>
+                            <TableCell className="font-medium">{commit.message}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                <span className="text-sm">{commit.author}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{commit.branch}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4" />
+                                <span className="text-sm">{commit.date}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{commit.filesChanged} files</Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {commit.deployments.length === 0 ? (
+                                  <span className="text-xs text-muted-foreground">No deployments</span>
+                                ) : (
+                                  commit.deployments.map((dep, idx) => (
+                                    <Badge key={idx} variant="default" className="text-xs">
+                                      {dep.env}: {dep.version}
+                                    </Badge>
+                                  ))
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setExpandedCommit(expandedCommit === commit.id ? null : commit.id)}
+                              >
+                                {expandedCommit === commit.id ? "Hide" : "Files"}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                          {expandedCommit === commit.id && (
+                            <TableRow>
+                              <TableCell colSpan={8} className="bg-muted/50">
+                                <div className="py-4">
+                                  <h4 className="font-semibold mb-2">Files Changed ({commit.filesChanged}):</h4>
+                                  <ul className="space-y-1">
+                                    {commit.files.map((file, idx) => (
+                                      <li key={idx} className="text-sm flex items-center gap-2">
+                                        <FileCode className="h-4 w-4 text-muted-foreground" />
+                                        <code className="text-xs bg-muted px-1 py-0.5 rounded">{file}</code>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                  {commit.deployments.length > 0 && (
+                                    <div className="mt-4">
+                                      <h4 className="font-semibold mb-2">Deployment History:</h4>
+                                      <div className="flex flex-wrap gap-2">
+                                        {commit.deployments.map((dep, idx) => (
+                                          <div key={idx} className="text-xs bg-muted px-2 py-1 rounded">
+                                            <span className="font-medium">{dep.env}</span>: {dep.version}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
         <TabsContent value="graph">
           <Card>
             <CardHeader>
               <CardTitle>Git Graph Visualization</CardTitle>
-              <CardDescription>Visual representation of branch and commit history</CardDescription>
+              <CardDescription>
+                Visual representation of branch and commit history using{" "}
+                <a 
+                  href="https://www.nicoespeon.com/gitgraph.js/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  gitgraph.js
+                </a>
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="bg-background border rounded-lg p-4 overflow-auto">
@@ -457,19 +544,35 @@ export default function RepoDashboard() {
                   }}
                 >
                   {(gitgraph) => {
-                    const main = gitgraph.branch("main");
-                    main.commit("Initial commit");
-                    main.commit("Add authentication module");
+                    // Create branches based on actual commits
+                    const branches: Record<string, any> = {};
                     
-                    const feature = gitgraph.branch("feature/dashboard");
-                    feature.commit("Refactor user dashboard components");
+                    // Create main branch
+                    branches["main"] = gitgraph.branch("main");
                     
-                    main.commit("Update API endpoints");
+                    // Process commits to build graph dynamically
+                    mockCommits
+                      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                      .forEach(commit => {
+                        // Create branch if it doesn't exist
+                        if (!branches[commit.branch]) {
+                          branches[commit.branch] = gitgraph.branch(commit.branch);
+                        }
+                        
+                        // Add commit to branch
+                        branches[commit.branch].commit({
+                          subject: commit.message,
+                          author: commit.author,
+                          hash: commit.hash,
+                        });
+                      });
                     
-                    const theme = gitgraph.branch("feature/theme");
-                    theme.commit("Implement dark mode theme");
-                    
-                    main.merge(feature);
+                    // Merge feature branches back to main
+                    Object.keys(branches).forEach(branchName => {
+                      if (branchName !== "main" && Math.random() > 0.5) {
+                        branches["main"].merge(branches[branchName]);
+                      }
+                    });
                   }}
                 </Gitgraph>
               </div>
@@ -481,18 +584,42 @@ export default function RepoDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Repository Visualization</CardTitle>
-              <CardDescription>Visual representation of repository structure</CardDescription>
+              <CardDescription>
+                Visual representation of repository structure using{" "}
+                <a 
+                  href="https://githubnext.com/projects/repo-visualization/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  GitHub Next Repo Visualization
+                </a>
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center h-96 bg-muted rounded-lg">
-                <div className="text-center space-y-2">
-                  <FileCode className="h-12 w-12 mx-auto text-muted-foreground" />
-                  <p className="text-muted-foreground">
-                    Repository visualization coming soon
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Will integrate with GitHub Next's repo-visualization
-                  </p>
+              <div className="flex items-center justify-center h-96 bg-muted rounded-lg border-2 border-dashed">
+                <div className="text-center space-y-4 p-6">
+                  <FileCode className="h-16 w-16 mx-auto text-muted-foreground" />
+                  <div>
+                    <p className="text-lg font-medium text-foreground mb-2">
+                      Repository Visualization
+                    </p>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      This will integrate with GitHub Next's repo-visualization tool to show
+                      an interactive 3D visualization of your repository structure, file sizes,
+                      and recent changes.
+                    </p>
+                  </div>
+                  <Button variant="outline" asChild>
+                    <a 
+                      href="https://githubnext.com/projects/repo-visualization/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Learn More
+                    </a>
+                  </Button>
                 </div>
               </div>
             </CardContent>
