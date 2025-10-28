@@ -4,8 +4,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Github, CheckCircle2, XCircle } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
+  const [githubUsername, setGithubUsername] = useState("john-doe");
+  const { toast } = useToast();
+
+  const handleGithubConnect = () => {
+    // Simulate GitHub OAuth flow
+    setIsGithubConnected(true);
+    toast({
+      title: "GitHub Connected",
+      description: "Successfully connected to GitHub account",
+    });
+  };
+
+  const handleGithubDisconnect = () => {
+    setIsGithubConnected(false);
+    toast({
+      title: "GitHub Disconnected",
+      description: "Successfully disconnected from GitHub",
+    });
+  };
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
@@ -55,6 +80,61 @@ export default function Settings() {
           </div>
           <Button variant="outline">Test Connection</Button>
           <Button>Save Credentials</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Github className="h-5 w-5" />
+            GitHub Integration
+          </CardTitle>
+          <CardDescription>Connect your GitHub account for repository management</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/30">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center">
+                <Github className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">GitHub Account</p>
+                  {isGithubConnected ? (
+                    <Badge variant="default" className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <XCircle className="h-3 w-3" />
+                      Not Connected
+                    </Badge>
+                  )}
+                </div>
+                {isGithubConnected && (
+                  <p className="text-sm text-muted-foreground">@{githubUsername}</p>
+                )}
+              </div>
+            </div>
+            {isGithubConnected ? (
+              <Button variant="outline" onClick={handleGithubDisconnect}>
+                Disconnect
+              </Button>
+            ) : (
+              <Button onClick={handleGithubConnect}>
+                Connect GitHub
+              </Button>
+            )}
+          </div>
+          
+          {isGithubConnected && (
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>✓ Automatic sync enabled</p>
+              <p>✓ Repository access granted</p>
+              <p>✓ Webhook integration active</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

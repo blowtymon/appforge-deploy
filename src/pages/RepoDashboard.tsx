@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Gitgraph, Mode, TemplateName } from "@gitgraph/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { GitBranch, GitCommit, FileCode, User, Calendar, Search, Plus, ExternalLink } from "lucide-react";
+import { GitBranch, GitCommit, FileCode, User, Calendar, Search, Plus, ExternalLink, Github, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Commit {
@@ -130,6 +130,7 @@ export default function RepoDashboard() {
   const [groupBy, setGroupBy] = useState("none");
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
   const [repoSearchQuery, setRepoSearchQuery] = useState("");
+  const [isGithubConnected] = useState(true); // This should come from global state/context
 
   const branches = ["all", ...Array.from(new Set(mockCommits.map(c => c.branch)))];
   const authors = ["all", ...Array.from(new Set(mockCommits.map(c => c.author)))];
@@ -181,11 +182,43 @@ export default function RepoDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Repository Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Visualize repository activity, commits, and deployment history
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Repository Dashboard</h1>
+          <p className="text-muted-foreground mt-2">
+            Visualize repository activity, commits, and deployment history
+          </p>
+        </div>
+        
+        <Card className="w-fit">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-card border border-border flex items-center justify-center">
+                <Github className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm">GitHub Status</p>
+                  {isGithubConnected ? (
+                    <Badge variant="default" className="flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">Not Connected</Badge>
+                  )}
+                </div>
+                {isGithubConnected ? (
+                  <p className="text-xs text-muted-foreground">Last sync: 2 minutes ago</p>
+                ) : (
+                  <Link to="/settings" className="text-xs text-primary hover:underline">
+                    Connect in Settings
+                  </Link>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Stats */}
