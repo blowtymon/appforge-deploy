@@ -385,29 +385,85 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
       )}
 
       {step === 28 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex items-center gap-2 mb-4">
             <Tag className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Versions</h3>
           </div>
+          
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <h4 className="font-semibold mb-2">Version Management</h4>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li>• Every app needs to be committed to repository</li>
+                <li>• Each version takes a snapshot of the current app</li>
+                <li>• Snapshots include features, code, UI settings, and configurations</li>
+                <li>• You can recall any APP version from the repo at any time</li>
+              </ul>
+            </CardContent>
+          </Card>
+
           <div className="space-y-2">
             <Label htmlFor="version">Version Number</Label>
             <Input
               id="version"
-              placeholder="1.0.0"
+              placeholder="v1.1"
               value={data.version}
               onChange={(e) => onDataChange({ version: e.target.value })}
             />
+            <p className="text-xs text-muted-foreground">
+              Format: v1.0, v1.1, v2.0, etc.
+            </p>
+          </div>
+
+          <div className="flex items-center space-x-2 mt-4">
+            <Checkbox
+              id="tagRelease"
+              defaultChecked={false}
+            />
+            <Label htmlFor="tagRelease" className="font-normal cursor-pointer">
+              Tag this version for release (Author can TAG app once ready)
+            </Label>
           </div>
         </div>
       )}
 
       {step === 29 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex items-center gap-2 mb-4">
             <Upload className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Release</h3>
           </div>
+          
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <h4 className="font-semibold mb-2">Release Functionality</h4>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li>• Every time app is released, it's like tagging the version</li>
+                <li>• Release counter auto-increments with each commit to repo</li>
+                <li>• Example: V1.1 release 10 (or v1.1 r10) means version 1.1 after 252 commits</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium">Release Number</p>
+                  <p className="text-2xl font-bold text-primary">r10</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Total Commits</p>
+                  <p className="text-lg font-semibold">252</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Format: {data.version} r10 (version + release number)
+              </p>
+            </CardContent>
+          </Card>
+
           <div className="space-y-2">
             <Label htmlFor="releaseNotes">Release Notes</Label>
             <Textarea
@@ -422,13 +478,26 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
       )}
 
       {step === 30 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Deployments</h3>
           </div>
+          
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <h4 className="font-semibold mb-2">Deployment Tracking</h4>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li>• Counts how many times app has been deployed</li>
+                <li>• Each environment counts as separate deployment</li>
+                <li>• Example: v1.1 r10 d20 = version 1.1, release 10, 20 deployments</li>
+                <li>• Track: v1.1 R10 d20 on DEV, d21 on QA, d22 on PROD</li>
+              </ul>
+            </CardContent>
+          </Card>
+
           <div className="space-y-2">
-            <Label htmlFor="deploymentTarget">Deployment Target</Label>
+            <Label htmlFor="deploymentTarget">Deployment Target Environment</Label>
             <Select
               value={data.deploymentTarget}
               onValueChange={(value) => onDataChange({ deploymentTarget: value })}
@@ -437,13 +506,40 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
                 <SelectValue placeholder="Select deployment target" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="dev">Development</SelectItem>
+                <SelectItem value="dev">Development (DEV)</SelectItem>
                 <SelectItem value="qa">QA</SelectItem>
                 <SelectItem value="staging">Staging</SelectItem>
-                <SelectItem value="prod">Production</SelectItem>
+                <SelectItem value="prod">Production (PROD)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          <Card>
+            <CardContent className="p-4">
+              <h4 className="font-semibold mb-4">Deployment Counter by Environment</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">DEV</p>
+                  <p className="text-xl font-bold text-blue-600">d20</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">QA</p>
+                  <p className="text-xl font-bold text-green-600">d21</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Staging</p>
+                  <p className="text-xl font-bold text-yellow-600">d15</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">PROD</p>
+                  <p className="text-xl font-bold text-red-600">d22</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Full version: {data.version} r10 d{data.deploymentTarget === 'dev' ? '20' : data.deploymentTarget === 'qa' ? '21' : data.deploymentTarget === 'staging' ? '15' : '22'}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
