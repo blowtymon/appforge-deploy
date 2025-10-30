@@ -31,15 +31,15 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
   const [newFeature, setNewFeature] = useState("");
 
   const steps = [
-    { id: 1, title: "Description", icon: "📝" },
-    { id: 2, title: "Keywords/Tags", icon: "🏷️" },
-    { id: 3, title: "Intersections", icon: "🔗" },
-    { id: 4, title: "Use Cases", icon: "💡" },
-    { id: 5, title: "Brain Map", icon: "🗺️" },
-    { id: 6, title: "User Stories", icon: "👥" },
-    { id: 7, title: "Feature List", icon: "📋" },
-    { id: 8, title: "Requirements", icon: "📄" },
-    { id: 9, title: "Kanban", icon: "📊" },
+    { id: 2, title: "Description", icon: "📝" },
+    { id: 3, title: "Keywords/Tags", icon: "🏷️" },
+    { id: 4, title: "Intersections", icon: "🔗" },
+    { id: 5, title: "Use Cases", icon: "💡" },
+    { id: 6, title: "Brain Map", icon: "🗺️" },
+    { id: 7, title: "User Stories", icon: "👥" },
+    { id: 8, title: "Feature List", icon: "📋" },
+    { id: 9, title: "Requirements", icon: "📄" },
+    { id: 10, title: "Kanban", icon: "📊" },
   ];
 
   const addKeyword = () => {
@@ -104,7 +104,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
       </div>
 
       {/* Step Content */}
-      {step === 1 && (
+      {step === 2 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Lightbulb className="h-5 w-5 text-primary" />
@@ -123,7 +123,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <FileText className="h-5 w-5 text-primary" />
@@ -157,7 +157,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Intersections</h3>
           <div className="space-y-2">
@@ -175,7 +175,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 4 && (
+      {step === 5 && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Use Cases</h3>
           <div className="space-y-2">
@@ -215,7 +215,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 5 && (
+      {step === 6 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Map className="h-5 w-5 text-primary" />
@@ -233,7 +233,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 6 && (
+      {step === 7 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Users className="h-5 w-5 text-primary" />
@@ -295,7 +295,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 7 && (
+      {step === 8 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <List className="h-5 w-5 text-primary" />
@@ -338,7 +338,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 8 && (
+      {step === 9 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <FileText className="h-5 w-5 text-primary" />
@@ -403,7 +403,7 @@ export function BrainstormingPhase({ step, data, onDataChange }: BrainstormingPh
         </div>
       )}
 
-      {step === 9 && (
+      {step === 10 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Trello className="h-5 w-5 text-primary" />

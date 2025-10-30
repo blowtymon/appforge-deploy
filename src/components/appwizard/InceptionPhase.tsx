@@ -61,17 +61,17 @@ const existingRepos = [
 
 export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps) {
   const steps = [
-    { id: 19, title: "App Creation", icon: "🚀" },
-    { id: 20, title: "Domain Name", icon: "🌐" },
-    { id: 21, title: "Features", icon: "⚡" },
-    { id: 22, title: "Page Generation", icon: "📄" },
-    { id: 23, title: "Content Mgmt", icon: "📝" },
-    { id: 24, title: "Cloud Infra", icon: "☁️" },
-    { id: 25, title: "Environments", icon: "🔧" },
-    { id: 26, title: "Repo/Branches", icon: "🌿" },
-    { id: 27, title: "Versions", icon: "🏷️" },
-    { id: 28, title: "Release", icon: "📦" },
-    { id: 29, title: "Deployments", icon: "⚡" },
+    { id: 20, title: "App Creation", icon: "🚀" },
+    { id: 21, title: "Domain Name", icon: "🌐" },
+    { id: 22, title: "Features", icon: "⚡" },
+    { id: 23, title: "Page Generation", icon: "📄" },
+    { id: 24, title: "Content Mgmt", icon: "📝" },
+    { id: 25, title: "Cloud Infra", icon: "☁️" },
+    { id: 26, title: "Environments", icon: "🔧" },
+    { id: 27, title: "Repo/Branches", icon: "🌿" },
+    { id: 28, title: "Versions", icon: "🏷️" },
+    { id: 29, title: "Release", icon: "📦" },
+    { id: 30, title: "Deployments", icon: "⚡" },
   ];
 
   return (
@@ -96,7 +96,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
       </div>
 
       {/* Step Content */}
-      {step === 19 && (
+      {step === 20 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Rocket className="h-5 w-5 text-primary" />
@@ -124,7 +124,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 20 && (
+      {step === 21 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Globe className="h-5 w-5 text-primary" />
@@ -164,7 +164,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 21 && (
+      {step === 22 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Layout className="h-5 w-5 text-primary" />
@@ -202,7 +202,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 22 && (
+      {step === 23 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <FileCode className="h-5 w-5 text-primary" />
@@ -220,7 +220,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 23 && (
+      {step === 24 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <FileCode className="h-5 w-5 text-primary" />
@@ -238,7 +238,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 24 && (
+      {step === 25 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Cloud className="h-5 w-5 text-primary" />
@@ -273,7 +273,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 25 && (
+      {step === 26 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Server className="h-5 w-5 text-primary" />
@@ -299,7 +299,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 26 && (
+      {step === 27 && (
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-4">
             <GitBranch className="h-5 w-5 text-primary" />
@@ -384,7 +384,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 27 && (
+      {step === 28 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Tag className="h-5 w-5 text-primary" />
@@ -402,7 +402,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 28 && (
+      {step === 29 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Upload className="h-5 w-5 text-primary" />
@@ -421,7 +421,7 @@ export function InceptionPhase({ step, data, onDataChange }: InceptionPhaseProps
         </div>
       )}
 
-      {step === 29 && (
+      {step === 30 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-primary" />

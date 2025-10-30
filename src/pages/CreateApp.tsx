@@ -7,14 +7,21 @@ import { BrainstormingPhase } from "@/components/appwizard/BrainstormingPhase";
 import { MarketingPhase } from "@/components/appwizard/MarketingPhase";
 import { InceptionPhase } from "@/components/appwizard/InceptionPhase";
 import { PhaseNavigation } from "@/components/appwizard/PhaseNavigation";
+import { DeploymentModeSelection } from "@/components/appwizard/DeploymentModeSelection";
+import { ProjectTypeSelection, ProjectType } from "@/components/appwizard/ProjectTypeSelection";
 
 export default function CreateApp() {
   const navigate = useNavigate();
-  const [currentPhase, setCurrentPhase] = useState<"brainstorming" | "marketing" | "inception">("brainstorming");
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentPhase, setCurrentPhase] = useState<"setup" | "brainstorming" | "marketing" | "inception">("setup");
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  // Setup phase data
+  const [deploymentMode, setDeploymentMode] = useState<"create" | "import" | null>(null);
+  const [projectTypes, setProjectTypes] = useState<ProjectType[]>([]);
   
   // Phase completion tracking
   const [phaseCompletion, setPhaseCompletion] = useState({
+    setup: false,
     brainstorming: false,
     marketing: false,
     inception: false,
@@ -69,13 +76,24 @@ export default function CreateApp() {
   // Phase definitions
   const phases = [
     {
+      id: "setup",
+      title: "🚀 Setup",
+      description: "Choose deployment mode and project type(s)",
+      icon: "🚀",
+      color: "bg-indigo-500",
+      status: phaseCompletion.setup ? "completed" : currentPhase === "setup" ? "active" : "locked",
+      stepRange: [0, 1],
+    },
+    {
       id: "brainstorming",
       title: "🧠 Brainstorming",
       description: "Idea incubation and planning. Define your concept, features, and requirements.",
       icon: "🧠",
       color: "bg-blue-500",
-      status: phaseCompletion.brainstorming ? "completed" : currentPhase === "brainstorming" ? "active" : "locked",
-      stepRange: [1, 9],
+      status: !phaseCompletion.setup
+        ? "locked"
+        : phaseCompletion.brainstorming ? "completed" : currentPhase === "brainstorming" ? "active" : "locked",
+      stepRange: [2, 10],
     },
     {
       id: "marketing",
@@ -90,7 +108,7 @@ export default function CreateApp() {
         : currentPhase === "marketing" 
         ? "active" 
         : "locked",
-      stepRange: [10, 18],
+      stepRange: [11, 19],
     },
     {
       id: "inception",
@@ -105,7 +123,7 @@ export default function CreateApp() {
         : currentPhase === "inception" 
         ? "active" 
         : "locked",
-      stepRange: [19, 29],
+      stepRange: [20, 30],
     },
   ];
 
@@ -114,18 +132,44 @@ export default function CreateApp() {
   const maxStep = currentPhaseData?.stepRange[1] || 9;
 
   const handleNext = () => {
+    // Validation for setup phase
+    if (currentPhase === "setup") {
+      if (currentStep === 0 && !deploymentMode) {
+        return; // Can't proceed without selecting deployment mode
+      }
+      if (currentStep === 1 && deploymentMode === "create" && projectTypes.length === 0) {
+        return; // Can't proceed without selecting project types
+      }
+    }
+
     if (currentStep < maxStep) {
       setCurrentStep(currentStep + 1);
     } else if (currentStep === maxStep) {
       // Complete current phase and move to next
-      if (currentPhase === "brainstorming") {
+      if (currentPhase === "setup") {
+        setPhaseCompletion({ ...phaseCompletion, setup: true });
+        // If importing, skip brainstorming and marketing
+        if (deploymentMode === "import") {
+          setPhaseCompletion({ 
+            ...phaseCompletion, 
+            setup: true,
+            brainstorming: true, 
+            marketing: true 
+          });
+          setCurrentPhase("inception");
+          setCurrentStep(20);
+        } else {
+          setCurrentPhase("brainstorming");
+          setCurrentStep(2);
+        }
+      } else if (currentPhase === "brainstorming") {
         setPhaseCompletion({ ...phaseCompletion, brainstorming: true });
         setCurrentPhase("marketing");
-        setCurrentStep(10);
+        setCurrentStep(11);
       } else if (currentPhase === "marketing") {
         setPhaseCompletion({ ...phaseCompletion, marketing: true });
         setCurrentPhase("inception");
-        setCurrentStep(19);
+        setCurrentStep(20);
       }
     }
   };
@@ -133,14 +177,23 @@ export default function CreateApp() {
   const handleBack = () => {
     if (currentStep > minStep) {
       setCurrentStep(currentStep - 1);
-    } else if (currentStep === minStep && currentPhase !== "brainstorming") {
+    } else if (currentStep === minStep && currentPhase !== "setup") {
       // Go back to previous phase
-      if (currentPhase === "marketing") {
+      if (currentPhase === "brainstorming") {
+        setCurrentPhase("setup");
+        setCurrentStep(1);
+      } else if (currentPhase === "marketing") {
         setCurrentPhase("brainstorming");
-        setCurrentStep(9);
+        setCurrentStep(10);
       } else if (currentPhase === "inception") {
-        setCurrentPhase("marketing");
-        setCurrentStep(18);
+        // If imported, go back to setup
+        if (deploymentMode === "import") {
+          setCurrentPhase("setup");
+          setCurrentStep(1);
+        } else {
+          setCurrentPhase("marketing");
+          setCurrentStep(19);
+        }
       }
     }
   };
@@ -148,14 +201,20 @@ export default function CreateApp() {
   const handlePhaseChange = (phaseId: string) => {
     const phase = phases.find((p) => p.id === phaseId);
     if (phase && phase.status !== "locked") {
-      setCurrentPhase(phaseId as "brainstorming" | "marketing" | "inception");
+      setCurrentPhase(phaseId as "setup" | "brainstorming" | "marketing" | "inception");
       setCurrentStep(phase.stepRange[0]);
     }
   };
 
   const handleComplete = () => {
     setPhaseCompletion({ ...phaseCompletion, inception: true });
-    console.log("All data:", { brainstormingData, marketingData, inceptionData });
+    console.log("All data:", { 
+      deploymentMode, 
+      projectTypes, 
+      brainstormingData, 
+      marketingData, 
+      inceptionData 
+    });
     navigate("/apps");
   };
 
@@ -197,6 +256,29 @@ export default function CreateApp() {
           </div>
         </CardHeader>
         <CardContent>
+          {currentPhase === "setup" && (
+            <>
+              {currentStep === 0 && (
+                <DeploymentModeSelection
+                  selectedMode={deploymentMode}
+                  onSelect={setDeploymentMode}
+                />
+              )}
+              {currentStep === 1 && deploymentMode === "create" && (
+                <ProjectTypeSelection
+                  selectedTypes={projectTypes}
+                  onSelect={setProjectTypes}
+                />
+              )}
+              {currentStep === 1 && deploymentMode === "import" && (
+                <div className="text-center py-12 space-y-4">
+                  <h2 className="text-2xl font-bold">Import Existing Repository</h2>
+                  <p className="text-muted-foreground">Repository import flow will be configured in the Inception phase.</p>
+                </div>
+              )}
+            </>
+          )}
+
           {currentPhase === "brainstorming" && (
             <BrainstormingPhase
               step={currentStep}
@@ -234,7 +316,7 @@ export default function CreateApp() {
         <Button 
           variant="outline" 
           onClick={handleBack} 
-          disabled={currentStep === 1 && currentPhase === "brainstorming"}
+          disabled={currentStep === 0 && currentPhase === "setup"}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
@@ -250,12 +332,23 @@ export default function CreateApp() {
         </div>
 
         {currentStep < maxStep ? (
-          <Button onClick={handleNext}>
+          <Button 
+            onClick={handleNext}
+            disabled={
+              (currentPhase === "setup" && currentStep === 0 && !deploymentMode) ||
+              (currentPhase === "setup" && currentStep === 1 && deploymentMode === "create" && projectTypes.length === 0)
+            }
+          >
             Next
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         ) : currentStep === maxStep && currentPhase !== "inception" ? (
-          <Button onClick={handleNext}>
+          <Button 
+            onClick={handleNext}
+            disabled={
+              (currentPhase === "setup" && currentStep === 1 && deploymentMode === "create" && projectTypes.length === 0)
+            }
+          >
             Complete Phase & Continue
             <Check className="h-4 w-4 ml-2" />
           </Button>

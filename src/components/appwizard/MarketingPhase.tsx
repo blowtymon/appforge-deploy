@@ -52,15 +52,15 @@ const channelOptions = [
 
 export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps) {
   const steps = [
-    { id: 10, title: "Market Research", icon: "📊" },
-    { id: 11, title: "Competitors", icon: "🎯" },
-    { id: 12, title: "SWOT", icon: "📈" },
-    { id: 13, title: "Pricing Model", icon: "💰" },
-    { id: 14, title: "Platforms", icon: "📱" },
-    { id: 15, title: "Channels", icon: "🏪" },
-    { id: 16, title: "Business Plan", icon: "📋" },
-    { id: 17, title: "Marketing Plan", icon: "📣" },
-    { id: 18, title: "Advertising Plan", icon: "📢" },
+    { id: 11, title: "Market Research", icon: "📊" },
+    { id: 12, title: "Competitors", icon: "🎯" },
+    { id: 13, title: "SWOT", icon: "📈" },
+    { id: 14, title: "Pricing Model", icon: "💰" },
+    { id: 15, title: "Platforms", icon: "📱" },
+    { id: 16, title: "Channels", icon: "🏪" },
+    { id: 17, title: "Business Plan", icon: "📋" },
+    { id: 18, title: "Marketing Plan", icon: "📣" },
+    { id: 19, title: "Advertising Plan", icon: "📢" },
   ];
 
   const addCompetitor = () => {
@@ -103,7 +103,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
       </div>
 
       {/* Step Content */}
-      {step === 10 && (
+      {step === 11 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-5 w-5 text-primary" />
@@ -124,7 +124,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 11 && (
+      {step === 12 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Target className="h-5 w-5 text-primary" />
@@ -187,7 +187,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 12 && (
+      {step === 13 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <BarChart className="h-5 w-5 text-primary" />
@@ -266,7 +266,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 13 && (
+      {step === 14 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <DollarSign className="h-5 w-5 text-primary" />
@@ -343,7 +343,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 14 && (
+      {step === 15 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Smartphone className="h-5 w-5 text-primary" />
@@ -375,7 +375,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 15 && (
+      {step === 16 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Store className="h-5 w-5 text-primary" />
@@ -407,7 +407,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 16 && (
+      {step === 17 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <FileText className="h-5 w-5 text-primary" />
@@ -428,7 +428,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 17 && (
+      {step === 18 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <BarChart className="h-5 w-5 text-primary" />
@@ -449,7 +449,7 @@ export function MarketingPhase({ step, data, onDataChange }: MarketingPhaseProps
         </div>
       )}
 
-      {step === 18 && (
+      {step === 19 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Megaphone className="h-5 w-5 text-primary" />
